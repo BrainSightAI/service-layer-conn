@@ -87,7 +87,7 @@ router.post('/', upload.single('fileLocation'), (req, res) => {
         process.exit(1);
     });
     //   return patientReport
-    res.status(200);
+    res.status(200).json(patientReport);
 
 })
 module.exports = router
