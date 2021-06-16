@@ -24,7 +24,7 @@ class azure {
         return serviceClient;
     }
 
-    storage(hospitalname, patientId) {
+    async storage(hospitalname, patientId) {
         function hospital(hospitalname) {
             var strings = hospitalname.split("@");
             var str = strings[1]
@@ -37,13 +37,21 @@ class azure {
 
         var shareName = "training";
         var directoryName = "Max/patientABC/ECM/input";
-        var zipfile = "dcm.zip";
+        var zipfile = "dicom.zip";
         const directoryClent = this.fileconnection();
 
+
+
         async function main() {
-            const directoryClient = directoryClent
-                .getShareClient(shareName)
-                .getDirectoryClient(directoryName);
+            const directoryClient = conn(directoryName);
+
+            function conn(directoryName) {
+                const directoryClient = directoryClent
+                    .getShareClient(shareName)
+                    .getDirectoryClient(directoryName);
+                return directoryClient
+            }
+
             const fileName = zipfile;
             const fileClient = directoryClient.getFileClient(fileName);
             var dirr = (process.cwd() + "/output.zip")
@@ -52,7 +60,7 @@ class azure {
                 parallelism: 20
             })
         }
-        main();
+        await main();
     }
 }
 

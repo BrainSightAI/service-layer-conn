@@ -58,19 +58,19 @@ router.post('/', compressfilesupload.array("file", 100), authenticate, (req, res
 
     async function main() {
         // create a Service Bus client using the connection string to the Service Bus namespace
-        const sbClient = new ServiceBusClient(connectionString);
+        // const sbClient = new ServiceBusClient(connectionString);
 
         // createSender() can also be used to create a sender for a topic.
-        const sender = sbClient.createSender(topicName);
+        // const sender = sbClient.createSender(topicName);
         // Send the last created batch of messages to the topic
-        await sender.sendMessages(messages);
+        // await sender.sendMessages(messages);
 
         console.log(`Sent a messages to the topic: ${topicName}`);
 
         // Close the sender
-        await sender.close(); {
-            await sbClient.close();
-        }
+        // await sender.close(); {
+        //     await sbClient.close();
+        // }
     }
     // call the main function
     main().catch((err) => {
