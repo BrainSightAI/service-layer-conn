@@ -8,7 +8,7 @@ const connection = new azureconn();
 
 class fetching {
     //recusrsive call for processing each file from sub folder
-    async recursivecall(dipPath, hospitalname, patientId) {
+    async recursivecall(dipPath, hospitalname, patientId, Disorder) {
         const getAllFiles = function(dirPath, arrayOfFiles) {
             var files = fs.readdirSync(dirPath)
             var arrayOfFiles = arrayOfFiles || []
@@ -24,7 +24,7 @@ class fetching {
         const processedfiles = getAllFiles(dipPath);
         await this.processdata(processedfiles);
         await data.zipfiy();
-        await connection.storage(hospitalname, patientId)
+        await connection.storage(hospitalname, patientId, Disorder)
         fs.rmdirSync((process.cwd() + "/diacomfolder"), { recursive: true })
         fs.unlinkSync((process.cwd() + "/output.zip"))
     }

@@ -7,7 +7,7 @@ async function authenticate(req, res, next) {
     const data = JSON.parse(req.body.body);
     const hospital = data.userId;
     const patientId = data.patientId;
-
+    const Disorder = JSON.parse(data.patient).crf.condition;
     var unzipPath = process.cwd() + "/zipyfy/unzip";
     //unzipping the file
     await (async() => {
@@ -18,7 +18,7 @@ async function authenticate(req, res, next) {
             console.log(error);
         }
     })();
-    await zipobj.recursivecall(unzipPath, hospital, patientId)
+    await zipobj.recursivecall(unzipPath, hospital, patientId, Disorder)
     next();
 }
 module.exports = authenticate;
