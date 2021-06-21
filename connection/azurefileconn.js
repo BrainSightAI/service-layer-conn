@@ -16,27 +16,22 @@ class azure {
         return serviceClient;
     }
 
+
     async storage(hospitalname, patientId, Disorder) {
-        function hospital(hospitalname) {
-            var strings = hospitalname.split("@");
-            var str = strings[1]
-            var stri = str.split(".");
-            var strng = stri[0];
-            return strng
-        }
 
-
-        var hospitalname = hospital(hospitalname);
-        var patientname = patientId;
-
+        var hospitalname = hospitalname; ///hospital name
+        var patientname = patientId; //patient name
         var shareName = "training";
         var directoryName = "Hospital";
         var zipfile = "diacomh.zip";
+        //connection with azure file share
         const directoryClent = this.fileconnection();
 
 
 
         async function main() {
+
+            ///path folder
             function conn(directoryName) {
                 const directoryClient = directoryClent
                     .getShareClient(shareName)
@@ -54,7 +49,6 @@ class azure {
                     await directory.create();
                     buildPath += '/';
                 }
-                // const diryName = (directoryName + "/" + dirName)
                 await uploadfile(dirrectorycreate)
             }
 
@@ -75,7 +69,6 @@ class azure {
             let dirIter = directoryClit.listFilesAndDirectories();
             var arr = [];
             await array(dirIter)
-
             async function array(dirIter) {
                 arr.splice(0, arr.length);
                 for await (const item of dirIter) {
@@ -85,18 +78,38 @@ class azure {
                 }
             }
 
-
             for (var i = 0; i < arr.length; i++) {
                 count++;
                 var hospitals = arr[i]
                 if (hospitals === hospitalname) {
-                    await cretecheck(hospitals)
+                    await createcheck(hospitals)
                     return false;
                 } else if (count === arr.length) {
                     var dirrectoryName = (hospitalname + "/" + patientname + "/" + Disorder);
                     var dirrectorycreate = (directoryName + "/" + hospitalname + "/" + patientname + "/" + Disorder);
                     await ifnotexist(dirrectoryName, directoryClit, dirrectorycreate);
-                    console.log(hospitalname + "/" + patientname + "/" + Disorder + "....created");
+                    console.log(dirrectoryName + "....created");
+                }
+            }
+
+            async function disorder() {
+                count = 0
+                for (var i = 0; i < arr.length; i++) {
+                    count++;
+                    var Pdisorder = arr[i]
+                    if (Pdisorder === Disorder) {
+                        var azurepath = (directoryName + "/" + hospitalname + "/" + patientname + "/" + Disorder);
+                        await uploadfile(azurepath);
+                        return false;
+                    } else if (count === arr.length) {
+                        var dirpartent = (directoryName + "/" + hospitalname + "/" + patientname)
+                        const disorderdirname = conn(dirpartent)
+                        var DdirName = (Disorder);
+                        var Ddirupload = (dirpartent + "/" + DdirName);
+                        await ifnotexist(DdirName, disorderdirname, Ddirupload);
+                        console.log(hospitalname + "/" + patientname + "....created");
+
+                    }
                 }
             }
 
@@ -109,13 +122,9 @@ class azure {
                     if (patient === patientname) {
                         var azurepath = (directoryName + "/" + hospitalname + "/" + patientname);
                         const directoryclnt1 = conn(azurepath);
-                        let dirIter = directoryclnt1.listFilesAndDirectories();
-                        for await (const item of dirIter) {
-                            if (item.name === Disorder) {
-                                var azurepath = (directoryName + "/" + hospitalname + "/" + patientname + "/" + Disorder);
-                                await uploadfile(azurepath);
-                            }
-                        }
+                        let dirIter2 = directoryclnt1.listFilesAndDirectories();
+                        await array(dirIter2)
+                        await disorder()
                         return false;
                     } else if (count === arr.length) {
                         var dirpartent = (directoryName + "/" + hospitalname)
@@ -129,24 +138,13 @@ class azure {
             }
 
 
-            async function cretecheck(hospitals) {
+            async function createcheck(hospitals) {
                 if (hospitals === hospitalname) {
                     var azurepath = (directoryName + "/" + hospitalname);
                     const directoryclnt1 = conn(azurepath);
                     let dirIterr = directoryclnt1.listFilesAndDirectories();
                     await array(dirIterr);
                     await paitentcheck();
-                    // if (item.name === patientname) {
-                    //     var azurepath = (directoryName + "/" + hospitalname + "/" + patientname);
-                    //     const directoryclnt1 = conn(azurepath);
-                    //     let dirIter = directoryclnt1.listFilesAndDirectories();
-                    //     for await (const item of dirIter) {
-                    //         if (item.name === Disorder) {
-                    //             var azurepath = (directoryName + "/" + hospitalname + "/" + patientname + "/" + Disorder);
-                    //             await uploadfile(azurepath);
-                    //         }
-                    //     }
-                    // }
 
                 }
 
@@ -158,60 +156,3 @@ class azure {
 
 
 module.exports = azure;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // arr.forEach(
-// if (item.name === hospitalname) {
-//     count++;
-//     var azurepath = (directoryName + "/" + hospitalname);
-//     const directoryclnt1 = conn(azurepath);
-//     let dirIter = directoryclnt1.listFilesAndDirectories();
-//     for await (const item of dirIter) {
-//         if (item.name === patientname) {
-//             var azurepath = (directoryName + "/" + hospitalname + "/" + patientname);
-//             const directoryclnt1 = conn(azurepath);
-//             let dirIter = directoryclnt1.listFilesAndDirectories();
-//             for await (const item of dirIter) {
-//                 if (item.name === "DCN") {
-//                     var azurepath = (directoryName + "/" + hospitalname + "/" + patientname + "/" + "DCN");
-//                     await uploadfile(azurepath);
-//                 }
-//             }
-//         }
-//     }
-// } else if (count === 0) {
-//     var dirName = (hospitalname + "/" + patientname + "/DCN");
-//     await ifnotexist(dirName);
-//     console.log(hospitalname + "/" + patientname + "/DCN" + "....created");
-// }
-
-
-// const fileName = zipfile;
-// const fileClient = directoryClit.getFileClient(fileName);
-// var dirr = (process.cwd() + "/output.zip")
-
-
-
-// await fileClient.uploadFile(dirr, {
-//     rangeSize: 4 * 1024 * 1024,
-//     parallelism: 20
-// })
-
-// if ((arr.length === count) || (arr[i] !== hospitalname)) {
-//     var dirName = (hospitalname + "/" + patientname + "/DCN");
-//     await ifnotexist(dirName);
-//     console.log(hospitalname + "/" + patientname + "/DCN" + "....created");
-// }
